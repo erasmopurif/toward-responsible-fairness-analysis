@@ -57,30 +57,30 @@ The repository implements the generalised **Multiclass and Multigroup Fairness M
 Let:
 * $M$ be the number of *classes*;
 * $N$ be the number of *demographic groups*;
-* $y \in \{0, ..., M-1\}$ be the *target class*;
-* $\hat{y} \in \{0, ..., M-1\}$ be the *predicted class*;
-* $s \in \{0, ..., N-1\}$ be the *sensitive attribute*.
+* $y \in \lbrace 0, ..., M-1 \rbrace$ be the *target class*;
+* $\hat{y} \in \lbrace 0, ..., M-1 \rbrace$ be the *predicted class*;
+* $s \in \lbrace 0, ..., N-1 \rbrace$ be the *sensitive attribute*.
 
 The score of each of the metrics displayed below should be equal across every class and group:
 
 ### **Multiclass and multigroup statistical parity**
 $$
-P(\hat{y} = m | s = n), \forall m \in \{0,...,M-1\} \land \forall n \in \{0,...,N-1\}
+P(\hat{y} = m | s = n), \forall m \in \lbrace 0,...,M-1 \rbrace \land \forall n \in \lbrace 0,...,N-1 \rbrace
 $$
 
 ### **Multiclass and multigroup equal opportunity**
 $$
-P(\hat{y} = m | y = m, s = n), \forall m \in \{0,...,M-1\} \land \forall n \in \{0,...,N-1\}
+P(\hat{y} = m | y = m, s = n), \forall m \in \lbrace 0,...,M-1 \rbrace \land \forall n \in \lbrace 0,...,N-1 \rbrace
 $$
 
 ### **Multiclass and multigroup overall accuracy equality**
 $$
-\sum_{m=0}^{M-1} P(\hat{y} = m | y = m, s = n), \forall n \in \{0,...,N-1\}
+\sum_{m=0}^{M-1} P(\hat{y} = m | y = m, s = n), \forall n \in \lbrace 0,...,N-1 \rbrace
 $$
 
 ### **Multiclass and multigroup treatment equality**
 $$
-\frac{P(\hat{y} = m | y \neq m, s = n)}{P(\hat{y} \neq m | y = m, s = n)}, \forall m \in \{0,...,M-1\} \land \forall n \in \{0,...,N-1\}
+\frac{P(\hat{y} = m | y \neq m, s = n)}{P(\hat{y} \neq m | y = m, s = n)}, \forall m \in \lbrace 0,...,M-1 \rbrace \land \forall n \in \lbrace 0,...,N-1 \rbrace
 $$
 
 ## Run the code
