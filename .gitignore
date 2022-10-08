@@ -4,6 +4,7 @@
 *.pkl
 attweight/
 *_old*
+*_DEV*
 
 ##### PYTHON STANDARD FILES TO IGNORE #####
 
