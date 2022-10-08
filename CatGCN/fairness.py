@@ -5,14 +5,9 @@ class Fairness(object):
     """
     Compute fairness metrics
     """
-    def __init__(self, df_profile, test_nodes_idx, targets, predictions, sens_attr, neptune_run,
-            multiclass_pred=False, multiclass_sens=False):
+    def __init__(self, df_profile, test_nodes_idx, targets, predictions, sens_attr):
 
-        self.multiclass_pred = multiclass_pred
-        self.multiclass_sens = multiclass_sens
         self.sens_attr = sens_attr
-        self.neptune_run = neptune_run
-        self.neptune_run["sens_attr"] = self.sens_attr
         self.df_profile = df_profile
         self.test_nodes_idx = test_nodes_idx.cpu().detach().numpy()
         self.true_y = targets # target variables
@@ -58,7 +53,6 @@ class Fairness(object):
                     sum(np.bitwise_and(self.y_hat[y_hat_idx], self.s[s_idx])) /
                     sum(self.s[s_idx])
                 )
-                self.neptune_run["fairness/SP_y^" + str(y_hat_idx) + "_s" + str(s_idx)] = stat_parity[y_hat_idx][s_idx]
 
     
     def equal_opportunity(self):
@@ -78,7 +72,6 @@ class Fairness(object):
                     )
                 except ZeroDivisionError:
                     equal_opp[y_hat_idx].append(0)
-                self.neptune_run["fairness/EO_y" + str(y_hat_idx) + "_s" + str(s_idx)] = equal_opp[y_hat_idx][s_idx]
 
 
     def overall_accuracy_equality(self):
@@ -95,7 +88,6 @@ class Fairness(object):
                 except ZeroDivisionError:
                     oae_temp += 0.0
             oae_s.append(oae_temp)
-            self.neptune_run["fairness/OAE_s" + str(s_idx)] = oae_s[s_idx]
 
 
     def treatment_equality(self):
@@ -137,7 +129,3 @@ class Fairness(object):
                     te[y_hat_idx].append(te_fp_fn[y_hat_idx][s_idx])
                 else:
                     te[y_hat_idx].append(te_fn_fp[y_hat_idx][s_idx])
-
-        for y_idx in self.class_range:
-            for s_idx in self.sens_attr_range:
-                self.neptune_run["fairness/TE_y" + str(y_idx) + "_s" + str(s_idx)] = te[y_idx][s_idx]

@@ -177,31 +177,4 @@ def parameter_parser():
                         default="",
                         help="Classification label.")
 
-    parser.add_argument("--log-tags",
-                        type=str,
-                        default="",
-                        help="Tags for Neptune logs.")
-
-    # Args for tracking data in Neptune.ai
-    parser.add_argument("--neptune-project",
-                        type=str,
-                        default="",
-                        help="Name of the Neptune.ai project to store the experiment info.")
-
-    parser.add_argument("--neptune-token",
-                        type=str,
-                        default="",
-                        help="API-token of Neptune.ai project.")
-
-    # Args for multiclass fairness analysis
-    parser.add_argument("--multiclass-pred",
-                        type=bool,
-                        default=False,
-                        help="Classifier type (multiclass or binary).")
-
-    parser.add_argument("--multiclass-sens",
-                        type=bool,
-                        default=False,
-                        help="Sensitive attribute type (multiclass or binary).")
-
     return parser.parse_args()

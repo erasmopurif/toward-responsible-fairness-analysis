@@ -13,10 +13,9 @@ class ClusterGNNTrainer(object):
     """
     Training a huge graph cluster partition strategy.
     """
-    def __init__(self, args, clustering_machine, neptune_run):
+    def __init__(self, args, clustering_machine):
         self.args = args
         self.clustering_machine = clustering_machine
-        self.neptune_run = neptune_run
         self.device = torch.device("cuda:{}".format(args.gpu) if torch.cuda.is_available() else "cpu")
         self.class_weight = clustering_machine.class_weight.to(self.device)
         self.create_model()
@@ -175,12 +174,9 @@ class ClusterGNNTrainer(object):
         macro_f1 = metrics.f1_score(self.targets, self.predictions, average="macro")
         classification_report = metrics.classification_report(self.targets, self.predictions, digits=4)
         print(classification_report)
-        # Confusion matrics and AUC
+        # Confusion matrics
         confusion_matrix = metrics.confusion_matrix(self.targets, self.predictions)
         print(confusion_matrix)
-        # fpr, tpr, _ = metrics.roc_curve(self.targets, self.predictions)
-        # auc = metrics.auc(fpr, tpr)
-        # print("AUC:", auc)
 
         train_time = (time.perf_counter() - train_start_time)/60
 
@@ -193,14 +189,3 @@ class ClusterGNNTrainer(object):
             "||",
             "accuracy: {:.4f}".format(acc_score),
             "macro-f1: {:.4f}".format(macro_f1))        
-
-        # Save results on Neptune
-        self.neptune_run["best_epoch"] = best_epoch
-        self.neptune_run["test/loss"] = test_loss
-        self.neptune_run["test/acc"] = acc_score
-        self.neptune_run["test/f1"] = macro_f1
-        # self.neptune_run["test/auc"] = auc
-        # self.neptune_run["test/tpr"] = tpr
-        # self.neptune_run["test/fpr"] = fpr
-        self.neptune_run["conf_matrix"] = confusion_matrix
-        self.neptune_run["train_time"] = train_time
