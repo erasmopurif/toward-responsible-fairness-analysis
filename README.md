@@ -1,14 +1,14 @@
-# It Looks Fair but It's Not
-Repository of the paper "It Looks Fair, but It’s Not: From Binary to Multiclass and Multigroup Fairness in Graph Neural Network-Based Models for User Profiling" by Erasmo Purificato, Ludovico Boratto and Ernesto William De Luca.
+# Towards a Human-Centred Fairness Analysis
+Repository of the paper "Towards a Human-Centred Fairness Analysis: From Binary to Multiclass and Multigroup Assessment in Graph Neural Network-Based Models for User Profiling Tasks" by Erasmo Purificato, Ludovico Boratto and Ernesto William De Luca.
 
 ## Abstract
-User profiling is a key topic in many applications, mainly information retrieval systems and social networks.
+User profiling is a key topic in many applications, mainly social networks and information retrieval systems.
 To assess how effective a user profiling approach is, its capability to classify personal characteristics (e.g. the gender, age or consumption grade of the users) is evaluated. 
-Due to the fact that some of the attributes to predict are multiclass (e.g. age is non-binary), assessing *fairness* in user profiling becomes a challenge, since most of the related metrics work with binary attributes.
+Due to the fact that some of the attributes to predict are multiclass (e.g. age is non-binary), assessing fairness in user profiling becomes a challenge since most of the related metrics work with binary attributes.
 As a workaround, the original multiclass attributes are usually binarised to meet standard fairness metrics definitions where both the target class and sensitive attribute (such as gender or age) are binary. However, this alters the original conditions, and fairness is evaluated on classes that differ from those used in the classification.
-In this paper, we extend the definitions of four existing *fairness metrics* (related to disparate impact and disparate mistreatment) from binary to multiclass scenarios, considering different settings where either the target class or the sensitive attribute are non-binary.
+In this paper, we extend the definitions of four existing \textit{fairness metrics} (related to disparate impact and disparate mistreatment) from binary to multiclass scenarios, considering different settings where either the target class or the sensitive attribute are non-binary.
 Our work is an endeavour to bridge the gap between formal definitions and real use cases in the field of bias detection.
-The results of the experiments conducted on two real-world datasets by leveraging two state-of-the-art graph neural network-based models for user profiling show that the proposed generalisation of fairness metrics can lead to a more effective and fine-grained comprehension of disadvantaged sensitive groups and, in some cases, to a better analysis of machine learning models originally deemed to be fair.
+The results of the experiments, conducted on two real-world datasets by leveraging two state-of-the-art graph neural network-based models for user profiling, show that the proposed generalisation of fairness metrics can lead to a more effective and fine-grained comprehension of disadvantaged sensitive groups and, in some cases, to a better analysis of machine learning models originally deemed to be fair.
 
 ## Requirements
 The code has been executed under **Python 3.8.1**, with the dependencies listed below.
