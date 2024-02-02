@@ -1,17 +1,19 @@
-# Towards a Human-Centred Fairness Analysis
-Repository of the paper "Towards a Human-Centred Fairness Analysis: From Binary to Multiclass and Multigroup Assessment in Graph Neural Network-Based Models for User Profiling Tasks" by Erasmo Purificato, Ludovico Boratto and Ernesto William De Luca.
+[![Python](https://img.shields.io/badge/Python-3.9.18-%233776AB?logo=Python)](https://www.python.org/)
+
+# Towards a Human-Centered Fairness Analysis
+Repository of the paper *"Towards a Human-Centered Fairness Analysis: From Binary to Multiclass and Multigroup Assessment in Graph Neural Network-Based User Modeling Tasks"* by Erasmo Purificato, Ludovico Boratto and Ernesto William De Luca.
 
 ## Abstract
-User profiling is a key topic in many applications, mainly social networks and information retrieval systems.
-To assess how effective a user profiling approach is, its capability to classify personal characteristics (e.g. the gender, age or consumption grade of the users) is evaluated. 
-Due to the fact that some of the attributes to predict are multiclass (e.g. age is non-binary), assessing fairness in user profiling becomes a challenge since most of the related metrics work with binary attributes.
-As a workaround, the original multiclass attributes are usually binarised to meet standard fairness metrics definitions where both the target class and sensitive attribute (such as gender or age) are binary. However, this alters the original conditions, and fairness is evaluated on classes that differ from those used in the classification.
-In this paper, we extend the definitions of four existing \textit{fairness metrics} (related to disparate impact and disparate mistreatment) from binary to multiclass scenarios, considering different settings where either the target class or the sensitive attribute are non-binary.
-Our work is an endeavour to bridge the gap between formal definitions and real use cases in the field of bias detection.
-The results of the experiments, conducted on two real-world datasets by leveraging two state-of-the-art graph neural network-based models for user profiling, show that the proposed generalisation of fairness metrics can lead to a more effective and fine-grained comprehension of disadvantaged sensitive groups and, in some cases, to a better analysis of machine learning models originally deemed to be fair.
+User modeling is a key topic in many applications, mainly social networks and information retrieval systems.
+To assess the effectiveness of a user modeling approach, its capability to classify personal characteristics (e.g., the gender, age, or consumption grade of the users) is evaluated. 
+Due to the fact that some of the attributes to predict are multiclass (e.g., age usually encompasses multiple ranges), assessing \textit{fairness} in user modeling becomes a challenge since most of the related metrics work with binary attributes.
+As a workaround, the original multiclass attributes are usually binarized to meet standard fairness metrics definitions where both the target class and sensitive attribute (such as gender or age) are binary. However, this alters the original conditions, and fairness is evaluated on classes that differ from those used in the classification.
+In this article, we extend the definitions of four existing fairness metrics (related to disparate impact and disparate mistreatment) from binary to multiclass scenarios, considering different settings where either the target class or the sensitive attribute includes more than two groups.
+Our work endeavors to bridge the gap between formal definitions and real use cases in bias detection.
+The results of the experiments, conducted on four real-world datasets by leveraging two state-of-the-art graph neural network-based models for user modeling, show that the proposed generalization of fairness metrics can lead to a more effective and fine-grained comprehension of disadvantaged sensitive groups and, in some cases, to a better analysis of machine learning models originally deemed to be fair.
 
 ## Requirements
-The code has been executed under **Python 3.8.1**, with the dependencies listed below.
+The code has been executed under **Python 3.9.18**, with the dependencies listed below.
 
 ### CatGCN
 ```
@@ -48,8 +50,10 @@ Notes:
 The preprocessed files required for running each model are included as a zip file within the related folder.
 
 The raw datasets are available at:
-* **Alibaba**: [link](https://tianchi.aliyun.com/dataset/dataDetail?dataId=56)
-* **JD**: [link](https://github.com/guyulongcs/IJCAI2019_HGAT)
+* [**Alibaba**](https://tianchi.aliyun.com/dataset/dataDetail?dataId=56)
+* [**JD**](https://github.com/guyulongcs/IJCAI2019_HGAT)
+* [**Pokec**](https://github.com/EnyanDai/FairGNN/tree/main/dataset/pokec)
+* [**NBA**](https://github.com/EnyanDai/FairGNN/tree/main/dataset/NBA)
 
 ## Multiclass and Multigroup Fairness Metrics
 The repository implements the generalised **Multiclass and Multigroup Fairness Metrics** presented in the paper.
@@ -108,6 +112,28 @@ $ python3 main.py --seed 11 --gpu 0 --learning-rate 1e-2 --weight-decay 1e-5 \
 --labels-path ./input_jd_data/user_labels.csv --sens-attr bin_age --label expense
 ```
 
+### CatGCN - Pokec dataset
+```
+$ cd CatGCN
+$ python3 main.py --seed 11 --gpu 0 --learning-rate 1e-3 --weight-decay 1e-5 \
+--dropout 0.7 --diag-probe 1 --graph-refining agc --aggr-pooling mean --grn-units 64 \
+--bi-interaction nfm --nfm-units none --graph-layer pna --gnn-hops 1 --gnn-units none \
+--aggr-style sum --balance-ratio 0.1 --edge-path ./input_pokec_data/edges.csv \
+--field-path ./input_pokec_data/categories.npy --target-path ./input_pokec_data/user_workfield.csv \
+--labels-path ./input_pokec_data/users.csv --sens-attr bin_age --label work_field
+```
+
+### CatGCN - NBA dataset
+```
+$ cd CatGCN
+$ python3 main.py --seed 3 --gpu 0 --learning-rate o.1 --weight-decay 1e-4 \
+--dropout 0.9 --diag-probe 39 --graph-refining agc --aggr-pooling mean --grn-units 64 \
+--bi-interaction nfm --nfm-units none --graph-layer pna --gnn-hops 1 --gnn-units 64 \
+--aggr-style sum --balance-ratio 0.7 --edge-path ./input_nba_data/edges.csv \
+--field-path ./input_nba_data/points.npy --target-path ./input_nba_data/user_bin_salary.csv \
+--labels-path ./input_nba_data/users.csv --sens-attr bin_age --label bin_salary
+```
+
 ### RHGN - Alibaba dataset
 ```
 $ cd RHGN
@@ -122,6 +148,22 @@ $ cd RHGN
 $ python3 jd_main.py --seed 3 --gpu 0 --model RHGN --data_dir ./input_jd_data/ \
 --graph G --max_lr 1e-3 --n_hid 64 --clip 1 --n_epoch 100 \
 --label bin_exp --sens_attr bin_age
+```
+
+### RHGN - Pokec dataset
+```
+$ cd RHGN
+$ python3 pokec_main.py --seed 11 --gpu 0 --model RHGN --data_dir ./input_pokec_data/ \
+--graph G --max_lr 1e-3 --n_hid 64 --clip 2 --n_epoch 100 \
+--label bin_work_field --sens_attr age
+```
+
+### RHGN - NBA dataset
+```
+$ cd RHGN
+$ python3 nba_main.py --seed 11 --gpu 0 --model RHGN --data_dir ./input_nba_data/ \
+--graph G --max_lr 0.1 --n_hid 32 --clip 1 --n_epoch 100 \
+--label salary --sens_attr age
 ```
 
 ## Contact

@@ -177,4 +177,9 @@ def parameter_parser():
                         default="",
                         help="Classification label.")
 
+    parser.add_argument("--dataset",
+                        type=str,
+                        default="",
+                        help="Name of the adopted dataset.")
+
     return parser.parse_args()

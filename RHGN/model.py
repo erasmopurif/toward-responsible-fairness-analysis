@@ -205,3 +205,180 @@ class jd_RHGN(nn.Module):
 
         return h, labels
 
+
+class pokec_RHGN(nn.Module):
+    def __init__(self, G, node_dict, edge_dict, n_inp, n_hid, n_out, n_layers, n_heads, pts_feature, height_feature, weight_feature, use_norm = True,):
+        super(pokec_RHGN, self).__init__()
+        self.node_dict = node_dict
+        self.edge_dict = edge_dict
+        self.gcs = nn.ModuleList()
+        self.n_inp = n_inp
+        self.n_hid = n_hid
+        self.n_out = n_out
+        self.n_layers = n_layers
+        self.adapt_ws  = nn.ModuleList()
+        for t in range(len(node_dict)):
+            self.adapt_ws.append(nn.Linear(n_inp,   n_hid))
+        for _ in range(n_layers):
+            self.gcs.append(RHGNLayer(n_hid, n_hid, node_dict, edge_dict, n_heads, use_norm = use_norm))
+        self.out = nn.Linear(n_hid, n_out)
+
+        self.pts_feature= nn.Embedding(pts_feature.size(0), pts_feature.size(1))
+        self.pts_feature.weight = nn.Parameter(pts_feature)
+        self.pts_feature.weight.requires_grad = False
+
+        self.height_feature= nn.Embedding(height_feature.size(0), height_feature.size(1))
+        self.height_feature.weight = nn.Parameter(height_feature)
+        self.height_feature.weight.requires_grad = False
+
+        self.weight_feature= nn.Embedding(weight_feature.size(0), weight_feature.size(1))
+        self.weight_feature.weight = nn.Parameter(weight_feature)
+        self.weight_feature.weight.requires_grad = False
+
+  
+        self.excitation = nn.Sequential(
+            nn.Linear(3, 32, bias=False),
+            nn.ReLU(),
+            nn.Linear(32, 3, bias=False),
+            nn.ReLU()
+        )
+        self.query = nn.Linear(200, n_inp)
+        self.key = nn.Linear(200, n_inp)
+        self.value = nn.Linear(200, n_inp)
+        self.skip = nn.Parameter(torch.ones(1))
+
+    def forward(self, input_nodes, output_nodes, blocks, out_key,label_key, is_train=True, print_flag=False):
+
+        user2_pts = blocks[0].srcnodes['user2'].data['completion'].unsqueeze(1) # (N,1)
+        pts_feature = self.pts_feature(user2_pts) # (N,1,200)
+	
+        user2_height = blocks[0].srcnodes['user2'].data['language'].unsqueeze(1) # (N,1)
+        height_feature = self.height_feature(user2_height) # (N,1,200)
+
+        user2_weight = blocks[0].srcnodes['user2'].data['hobby'].unsqueeze(1) # (N,1)
+        weight_feature = self.weight_feature(user2_weight) # (N,1,200)
+ 
+        # cid2_feature=cid1_feature
+        # cid3_feature=cid1_feature
+         
+        user2_feature = blocks[0].srcnodes['user2'].data['inp']
+        user1_feature = blocks[0].srcnodes['user1'].data['inp']
+        # brand_feature = blocks[0].srcnodes['brand'].data['inp']
+
+        inputs = torch.cat((pts_feature, height_feature, weight_feature), 1) # (N,4,200)
+        k = self.key(inputs) # (N,4,n_inp)
+        v = self.value(inputs) # (N,4,n_inp)
+        q = self.query(user2_feature.unsqueeze(-2)) # (N,1,n_inp)
+
+        att_score = torch.einsum("bij,bjk->bik", k, q.transpose(1,2)) / math.sqrt(200) #(N,4,1)
+        att_score = torch.softmax(att_score, axis=1) # (N,4,1)
+
+        
+        alpha = torch.sigmoid(self.skip) # (1,)
+        temp = v * att_score # (N,4,n_inp)
+        user2_feature = alpha*(torch.mean(temp, dim=-2).squeeze(-2))  + (1-alpha)* user2_feature # (N,200)
+
+        h = {}
+        h['user2']=F.gelu(self.adapt_ws[self.node_dict['user2']](user2_feature))
+        h['user1']=F.gelu(self.adapt_ws[self.node_dict['user1']](user1_feature))
+        # h['brand']=F.gelu(self.adapt_ws[self.node_dict['brand']](brand_feature))
+
+        for i in range(self.n_layers):
+            h = self.gcs[i](blocks[i], h, is_train=is_train,print_flag=print_flag)
+
+        h = h[out_key]
+        h=self.out(h)
+        labels=blocks[-1].dstnodes[out_key].data[label_key]
+
+        # h=F.log_softmax(h, dim=1)
+
+        return h, labels
+
+
+class nba_RHGN(nn.Module):
+    def __init__(self, G, node_dict, edge_dict, n_inp, n_hid, n_out, n_layers, n_heads, pts_feature, height_feature, weight_feature, use_norm = True,):
+        super(pokec_RHGN, self).__init__()
+        self.node_dict = node_dict
+        self.edge_dict = edge_dict
+        self.gcs = nn.ModuleList()
+        self.n_inp = n_inp
+        self.n_hid = n_hid
+        self.n_out = n_out
+        self.n_layers = n_layers
+        self.adapt_ws  = nn.ModuleList()
+        for t in range(len(node_dict)):
+            self.adapt_ws.append(nn.Linear(n_inp, n_hid))
+        for _ in range(n_layers):
+            self.gcs.append(RHGNLayer(n_hid, n_hid, node_dict, edge_dict, n_heads, use_norm = use_norm))
+        self.out = nn.Linear(n_hid, n_out)
+
+        self.pts_feature= nn.Embedding(pts_feature.size(0), pts_feature.size(1))
+        self.pts_feature.weight = nn.Parameter(pts_feature)
+        self.pts_feature.weight.requires_grad = False
+
+        self.height_feature= nn.Embedding(height_feature.size(0), height_feature.size(1))
+        self.height_feature.weight = nn.Parameter(height_feature)
+        self.height_feature.weight.requires_grad = False
+
+        self.weight_feature= nn.Embedding(weight_feature.size(0), weight_feature.size(1))
+        self.weight_feature.weight = nn.Parameter(weight_feature)
+        self.weight_feature.weight.requires_grad = False
+
+  
+        self.excitation = nn.Sequential(
+            nn.Linear(3, 32, bias=False),
+            nn.ReLU(),
+            nn.Linear(32, 3, bias=False),
+            nn.ReLU()
+        )
+        self.query = nn.Linear(200, n_inp)
+        self.key = nn.Linear(200, n_inp)
+        self.value = nn.Linear(200, n_inp)
+        self.skip = nn.Parameter(torch.ones(1))
+
+    def forward(self, input_nodes, output_nodes, blocks, out_key,label_key, is_train=True, print_flag=False):
+
+        user2_pts = blocks[0].srcnodes['user2'].data['pts'].unsqueeze(1) # (N,1)
+        pts_feature = self.pts_feature(user2_pts) # (N,1,200)
+	
+        user2_height = blocks[0].srcnodes['user2'].data['height'].unsqueeze(1) # (N,1)
+        height_feature = self.height_feature(user2_height) # (N,1,200)
+
+        user2_weight = blocks[0].srcnodes['user2'].data['weight'].unsqueeze(1) # (N,1)
+        weight_feature = self.weight_feature(user2_weight) # (N,1,200)
+ 
+        # cid2_feature=cid1_feature
+        # cid3_feature=cid1_feature
+         
+        user2_feature = blocks[0].srcnodes['user2'].data['inp']
+        user1_feature = blocks[0].srcnodes['user1'].data['inp']
+        # brand_feature = blocks[0].srcnodes['brand'].data['inp']
+
+        inputs = torch.cat((pts_feature, height_feature, weight_feature), 1) # (N,4,200)
+        k = self.key(inputs) # (N,4,n_inp)
+        v = self.value(inputs) # (N,4,n_inp)
+        q = self.query(user2_feature.unsqueeze(-2)) # (N,1,n_inp)
+
+        att_score = torch.einsum("bij,bjk->bik", k, q.transpose(1,2)) / math.sqrt(200) #(N,4,1)
+        att_score = torch.softmax(att_score, axis=1) # (N,4,1)
+
+        
+        alpha = torch.sigmoid(self.skip) # (1,)
+        temp = v * att_score # (N,4,n_inp)
+        user2_feature = alpha*(torch.mean(temp, dim=-2).squeeze(-2))  + (1-alpha)* user2_feature # (N,200)
+
+        h = {}
+        h['user2']=F.gelu(self.adapt_ws[self.node_dict['user2']](user2_feature))
+        h['user1']=F.gelu(self.adapt_ws[self.node_dict['user1']](user1_feature))
+        # h['brand']=F.gelu(self.adapt_ws[self.node_dict['brand']](brand_feature))
+
+        for i in range(self.n_layers):
+            h = self.gcs[i](blocks[i], h, is_train=is_train,print_flag=print_flag)
+
+        h = h[out_key]
+        h=self.out(h)
+        labels=blocks[-1].dstnodes[out_key].data[label_key]
+
+        # h=F.log_softmax(h, dim=1)
+
+        return h, labels
