@@ -1,7 +1,7 @@
 [![Python](https://img.shields.io/badge/Python-3.9.18-%233776AB?logo=Python)](https://www.python.org/)
 
 # Toward a Responsible Fairness Analysis
-Repository of the paper *"Toward Responsible Fairness Analysis: From Binary to Multiclass and Multigroup Assessment in Graph Neural Network-Based User Modeling Tasks"* by Erasmo Purificato, Ludovico Boratto and Ernesto William De Luca.
+Repository of the paper *"Toward a Responsible Fairness Analysis: From Binary to Multiclass and Multigroup Assessment in Graph Neural Network-Based User Modeling Tasks"* by Erasmo Purificato, Ludovico Boratto and Ernesto William De Luca, published Minds and Machines Journal for Artificial Intelligence, Philosophy and Cognitive Science (Special Issue on "Interdisciplinary Perspectives on the (Un)fairness of Artificial Intelligence").
 
 ## Abstract
 User modeling is a key topic in many applications, mainly social networks and information retrieval systems.
