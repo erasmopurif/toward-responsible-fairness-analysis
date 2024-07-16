@@ -167,5 +167,4 @@ $ python3 nba_main.py --seed 11 --gpu 0 --model RHGN --data_dir ./input_nba_data
 ```
 
 ## Contact
-<!-- Erasmo Purificato (erasmo.purificato@ovgu.de) -->
-erasmo.purificato@ovgu.de
+Erasmo Purificato ([erasmo.purificato@acm.org](mailto:erasmo.purificato@acm.org))
